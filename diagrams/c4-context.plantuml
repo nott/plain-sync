@@ -1,0 +1,19 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/nott/C4-PlantUML/master/C4_Context.puml
+Person(user, "User")
+
+System(laptop, "Laptop")
+System(desktop, "Desktop")
+System(smartphone, "Smatphone")
+
+System(remote, "Remote git repository")
+
+Rel(user, laptop, "edits text", "emacs,vim")
+Rel(user, desktop, "edits text", "emacs,vim")
+Rel(user, smartphone, "edits text", "orgzly,markor")
+
+Rel(laptop, remote, "synchronizes", "psy daemon")
+Rel(desktop, remote, "synchronizes", "psy daemon")
+Rel(smartphone, remote, "synchronizes", "psy daemon")
+
+@enduml

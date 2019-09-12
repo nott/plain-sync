@@ -1,0 +1,27 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/nott/C4-PlantUML/master/C4_Container.puml
+Person(user, "User")
+
+System(desktop, "Desktop")
+System_Boundary(laptop, "Laptop") {
+    Container(text_editor, "Text Editor", "emacs,vim,etc")
+    Container(psy_daemon, "Psy Daemon", "user service")
+    text_editor -[hidden]-> psy_daemon
+    Rel(psy_daemon, text_editor, "detects changes, commits them into a git repo", "inotify")
+}
+System(smartphone, "Smatphone")
+
+laptop -[hidden]> desktop
+desktop -[hidden]> smartphone
+
+System(remote, "Remote git repository")
+
+Rel(user, desktop, "edits text")
+Rel(user, text_editor, "edits text", "emacs,vim")
+Rel(user, smartphone, "edits text", "orgzly,markor")
+
+Rel(desktop, remote, "synchronizes", "psy daemon")
+Rel(psy_daemon, remote, "fetch, merge, push", "ssh")
+Rel(smartphone, remote, "synchronizes", "psy daemon")
+
+@enduml

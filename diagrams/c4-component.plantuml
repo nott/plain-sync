@@ -1,0 +1,37 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/nott/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "User")
+
+System_Boundary(laptop, "Laptop") {
+
+  Container(filesystem, "File System", "ext4,btrfs,...")
+
+  System_Boundary(psy_daemon, "Psy Daemon") {
+      Component(fs_watcher, "File System Watcher", "inotify")
+      Component(git_committer, "Git committer", "libgit2")
+      Component(git_merger, "Git merger", "libgit2")
+      Component(git_syncer, "Git syncer", "libgit2")
+
+      git_committer -[hidden]> git_merger
+      git_merger -[hidden]> git_syncer
+  }
+  Container(user_git, "User git repo", "git")
+  Container(shadow_git, "Shadow git repo", "git")
+}
+Container(remote_git, "Remote git repo", "git")
+shadow_git -[hidden]-> remote_git
+
+user -[hidden]-> laptop
+filesystem -[hidden]-> psy_daemon
+
+Rel(user, filesystem, "make changes")
+Rel(fs_watcher, filesystem, "track changes")
+Rel(fs_watcher, git_committer, "notify")
+Rel(git_committer, user_git, "commit changes")
+Rel(git_merger, user_git, "pull,push")
+Rel(git_merger, shadow_git, "merge")
+Rel(git_syncer, shadow_git, "merge")
+Rel(git_syncer, remote_git, "pull,push")
+
+@enduml
