@@ -15,6 +15,7 @@ impl GitCommitter {
     pub fn detect_and_commit(&mut self) -> Result<(), git2::Error> {
         let mut opts = git2::StatusOptions::new();
         opts.recurse_untracked_dirs(true);
+        opts.include_untracked(true);
 
         for status_entry in self.user_repo.statuses(Some(&mut opts))?.iter() {
             println!("status {:?}", status_entry.status());
@@ -32,14 +33,6 @@ impl GitCommitter {
                 s if s.contains(git2::Status::WT_NEW) => {
                     index.add_path(changed_file_path)?;
                     format!("File {path} added by {author}", path = changed_file_str, author = author)
-                }
-                s if s.contains(git2::Status::WT_RENAMED) => {
-                    index.add_path(changed_file_path)?;
-                    format!("File {path} renamed by {author}", path = changed_file_str, author = author)
-                }
-                s if s.contains(git2::Status::WT_TYPECHANGE) => {
-                    index.add_path(changed_file_path)?;
-                    format!("Type {path} changed by {author}", path = changed_file_str, author = author)
                 }
                 s if s.contains(git2::Status::WT_DELETED) => {
                     index.remove_path(changed_file_path)?;
