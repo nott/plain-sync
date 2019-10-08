@@ -18,8 +18,6 @@ impl GitCommitter {
         opts.include_untracked(true);
 
         for status_entry in self.user_repo.statuses(Some(&mut opts))?.iter() {
-            println!("status {:?}", status_entry.status());
-
             let mut index = self.user_repo.index()?;
             let changed_file_path = Path::new(status_entry.path().unwrap());
             let changed_file_str = changed_file_path.to_str().unwrap();
@@ -42,7 +40,6 @@ impl GitCommitter {
             };
 
             let tree_id = index.write_tree()?;
-            println!("tree_id {}", &tree_id);
             let tree = self.user_repo.find_tree(tree_id)?;
             let sig = self.user_repo.signature()?;
             let head_commit = self.user_repo.head()?.peel_to_commit()?;
