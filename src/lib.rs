@@ -1,3 +1,5 @@
+pub mod component;
+
 #[cfg(test)]
 mod tests {
     #[test]
