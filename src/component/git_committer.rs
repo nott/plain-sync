@@ -50,3 +50,44 @@ impl GitCommitter {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::process::Command;
+
+    use git2;
+
+    use super::*;
+
+    fn git_status(repo_path: &str) -> String {
+        let stdout = Command::new("git")
+            .args(&["status"])
+            .current_dir(&repo_path)
+            .output()
+            .expect("failed to get git status")
+            .stdout;
+        std::str::from_utf8(&stdout).unwrap().to_owned()
+    }
+
+    #[test]
+    fn test_no_changes() {
+        // given a clean git repo
+        let tmpdir = tempfile::tempdir().unwrap();
+        let tmp_repo_path = tmpdir.path().to_str().unwrap();
+        Command::new("git")
+            .arg("init")
+            .arg(tmp_repo_path)
+            .output()
+            .expect("failed to init repo");
+        // and a git committer
+        let mut git_committer = GitCommitter::new(git2::Repository::open(tmpdir.path()).unwrap());
+
+        // when calling method detect_and_commit
+        let git_status_before = git_status(&tmp_repo_path);
+        git_committer.detect_and_commit().unwrap();
+        let git_status_after = git_status(&tmp_repo_path);
+
+        // then the result of `git status` doesn't change
+        assert_eq!(git_status_before, git_status_after);
+    }
+}
