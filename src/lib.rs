@@ -1,4 +1,5 @@
 pub mod component;
+pub mod testing;
 
 #[cfg(test)]
 mod tests {
